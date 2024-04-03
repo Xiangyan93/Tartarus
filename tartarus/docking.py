@@ -12,11 +12,11 @@ import subprocess
 import itertools
 import argparse
 import multiprocessing    
-
+CWD = os.path.abspath(os.path.dirname(__file__))
 from .filter_ import process_molecule 
 
 
-def check_energy(lig_): 
+def check_energy(lig_, bin=''): 
     """
     Check the quality of a generated structure by computing its total energy using the Open Babel obenergy tool.
     Parameters:
@@ -26,7 +26,7 @@ def check_energy(lig_):
     """
     # Check the quality of generated structure (some post-processing quality control):
     try: 
-        ob_cmd = ['obenergy', lig_]
+        ob_cmd = [os.path.join(f'{bin}obenergy'), lig_]
         command_obabel_check = subprocess.run(ob_cmd, capture_output=True)
         command_obabel_check = command_obabel_check.stdout.decode("utf-8").split('\n')[-2]
         total_energy         = float(command_obabel_check.split(' ')[-2])
@@ -38,7 +38,7 @@ def check_energy(lig_):
 
     
 
-def run_docking_1syh(lig_location, out_location, method='qvina'): 
+def run_docking_1syh(lig_location, out_location, method='qvina', bin=''): 
     """
     Perform molecular docking with a specific methods (QuickVina/Smina) on the 1SYH protein. 
     An exhaustiveness of 10 is used for the QuickVina calculations, while an 
@@ -53,14 +53,13 @@ def run_docking_1syh(lig_location, out_location, method='qvina'):
     (float) Docking score.
     """
     if method == 'qvina': 
-        command_run = subprocess.run(["./data/qvina", "--receptor", "./docking_structures/1syh/prot.pdbqt", "--ligand", lig_location, "--center_x", "21.492800140380858", "--center_y", "13.457733376820881", "--center_z", "23.175899950663247", "--size_x", "20", "--size_y", "20", "--size_z", "20", "--exhaustiveness", "10", "--out", out_location], capture_output=True)
+        command_run = subprocess.run([f"{CWD}/data/qvina", "--receptor", f"{CWD}/docking_structures/1syh/prot.pdbqt", "--ligand", lig_location, "--center_x", "21.492800140380858", "--center_y", "13.457733376820881", "--center_z", "23.175899950663247", "--size_x", "20", "--size_y", "20", "--size_z", "20", "--exhaustiveness", "10", "--out", out_location], capture_output=True)
     elif method == 'smina': 
-        command_run = subprocess.run(["./data/smina", "--receptor", "./docking_structures/1syh/prot.pdbqt", "--ligand", lig_location, "--center_x", "21.492800140380858", "--center_y", "13.457733376820881", "--center_z", "23.175899950663247", "--size_x", "20", "--size_y", "20", "--size_z", "20", "--exhaustiveness", "100", "--out", out_location], capture_output=True)
+        command_run = subprocess.run([f"{CWD}/data/smina", "--receptor", f"{CWD}/docking_structures/1syh/prot.pdbqt", "--ligand", lig_location, "--center_x", "21.492800140380858", "--center_y", "13.457733376820881", "--center_z", "23.175899950663247", "--size_x", "20", "--size_y", "20", "--size_z", "20", "--exhaustiveness", "100", "--out", out_location], capture_output=True)
     else: 
         raise Exception('Possible docking softwares: qvina/smina')
-
     # Ensure the pose of the output molecule is not broken: 
-    pose_energy = check_energy(out_location)
+    pose_energy = check_energy(out_location, bin=bin)
     if pose_energy == 10000: # broken molecule generated (docking failed)
         return 10000
         
@@ -85,7 +84,7 @@ def run_docking_1syh(lig_location, out_location, method='qvina'):
     return docking_score
 
 
-def run_docking_4lde(lig_location, out_location, method='qvina'): 
+def run_docking_4lde(lig_location, out_location, method='qvina', bin=''): 
     """
     Perform molecular docking with a specific methods (QuickVina/Smina) on the 4LDE protein. 
     An exhaustiveness of 10 is used for the QuickVina calculations, while an 
@@ -100,14 +99,14 @@ def run_docking_4lde(lig_location, out_location, method='qvina'):
     (float) Docking score.
     """
     if method == 'qvina': 
-        command_run = subprocess.run(["./data/qvina", "--receptor", "./docking_structures/4lde/prot.pdbqt", "--ligand", lig_location, "--center_x", "-2.942962976793448", "--center_y", "-12.915592617458767", "--center_z", "-50.99233344749168", "--size_x", "20", "--size_y", "20", "--size_z", "20", "--exhaustiveness", "10", "--out", out_location], capture_output=True)
+        command_run = subprocess.run([f"{CWD}/data/qvina", "--receptor", f"{CWD}/docking_structures/4lde/prot.pdbqt", "--ligand", lig_location, "--center_x", "-2.942962976793448", "--center_y", "-12.915592617458767", "--center_z", "-50.99233344749168", "--size_x", "20", "--size_y", "20", "--size_z", "20", "--exhaustiveness", "10", "--out", out_location], capture_output=True)
     elif method == 'smina': 
-        command_run = subprocess.run(["./data/smina", "--receptor", "./docking_structures/4lde/prot.pdbqt", "--ligand", lig_location, "--center_x", "-2.942962976793448", "--center_y", "-12.915592617458767", "--center_z", "-50.99233344749168", "--size_x", "20", "--size_y", "20", "--size_z", "20", "--exhaustiveness", "100", "--out", out_location], capture_output=True)
+        command_run = subprocess.run([f"{CWD}/data/smina", "--receptor", f"{CWD}/docking_structures/4lde/prot.pdbqt", "--ligand", lig_location, "--center_x", "-2.942962976793448", "--center_y", "-12.915592617458767", "--center_z", "-50.99233344749168", "--size_x", "20", "--size_y", "20", "--size_z", "20", "--exhaustiveness", "100", "--out", out_location], capture_output=True)
     else: 
         raise Exception('Possible docking softwares: qvina/smina')
 
     # Ensure the pose of the output molecule is not broken: 
-    pose_energy = check_energy(out_location)
+    pose_energy = check_energy(out_location, bin=bin)
     if pose_energy == 10000: # broken molecule generated (docking failed)
         return 10000
         
@@ -132,7 +131,7 @@ def run_docking_4lde(lig_location, out_location, method='qvina'):
     return docking_score
 
 
-def run_docking_6y2f(lig_location, out_location, method='qvina'): 
+def run_docking_6y2f(lig_location, out_location, method='qvina', bin=''): 
     """
     Perform molecular docking with a specific methods (QuickVina/Smina) on the 6Y2F protein. 
     An exhaustiveness of 10 is used for the QuickVina calculations, while an 
@@ -147,14 +146,14 @@ def run_docking_6y2f(lig_location, out_location, method='qvina'):
     (float) Docking score.
     """
     if method == 'qvina': 
-        command_run = subprocess.run(["./data/qvina", "--receptor", "./docking_structures/6y2f/prot.pdbqt", "--ligand", lig_location, "--center_x", "11.026168696851615", "--center_y", "-0.6082891440804464", "--center_z", "20.840999947973046", "--size_x", "10", "--size_y", "10", "--size_z", "10", "--exhaustiveness", "10", "--out", out_location], capture_output=True)
+        command_run = subprocess.run([f"{CWD}/data/qvina", "--receptor", f"{CWD}/docking_structures/6y2f/prot.pdbqt", "--ligand", lig_location, "--center_x", "11.026168696851615", "--center_y", "-0.6082891440804464", "--center_z", "20.840999947973046", "--size_x", "10", "--size_y", "10", "--size_z", "10", "--exhaustiveness", "10", "--out", out_location], capture_output=True)
     elif method == 'smina': 
-        command_run = subprocess.run(["./data/smina", "--receptor", "./docking_structures/6y2f/prot.pdbqt", "--ligand", lig_location, "--center_x", "11.026168696851615", "--center_y", "-0.6082891440804464", "--center_z", "20.840999947973046", "--size_x", "10", "--size_y", "10", "--size_z", "10", "--exhaustiveness", "100", "--out", out_location], capture_output=True)
+        command_run = subprocess.run([f"{CWD}/data/smina", "--receptor", f"{CWD}/docking_structures/6y2f/prot.pdbqt", "--ligand", lig_location, "--center_x", "11.026168696851615", "--center_y", "-0.6082891440804464", "--center_z", "20.840999947973046", "--size_x", "10", "--size_y", "10", "--size_z", "10", "--exhaustiveness", "100", "--out", out_location], capture_output=True)
     else: 
         raise Exception('Possible docking softwares: qvina/smina')
 
     # Ensure the pose of the output molecule is not broken: 
-    pose_energy = check_energy(out_location)
+    pose_energy = check_energy(out_location, bin=bin)
     if pose_energy == 10000: # broken molecule generated (docking failed)
         return 10000
         
@@ -186,7 +185,7 @@ def generate_unique_file_name(base_name, extension):
     return file_name
 
 
-def perform_calc_single(smi, receptor_type, docking_program='qvina'): 
+def perform_calc_single(smi, receptor_type, docking_program='qvina', bin=''): 
     """
     Performs docking calculations on a single molecule-receptor pair.
     
@@ -222,37 +221,33 @@ def perform_calc_single(smi, receptor_type, docking_program='qvina'):
     created during the execution are deleted before the function returns.
     """
     try: 
-    
         pass_filt =  process_molecule(smi)
         if pass_filt[1] == 'Fail': 
             return 10**4
-    
+
         output_filename = generate_unique_file_name('lig', 'pdbqt')
         # print('smi: {} fname: {}'.format(smi, output_filename))
-        cmd = ["obabel", "-ismi","-:" + smi,"-O", output_filename, "--gen3d"]
+        cmd = ["%sobabel" % bin, "-ismi","-:" + smi,"-O", output_filename, "--gen3d"]
         subprocess.run(cmd, timeout=20)
         
         # Ensure a stable molecule: 
-        lig_energy = check_energy(output_filename)
-    
+        lig_energy = check_energy(output_filename, bin=bin)
+
         # Specifying docking input file & output file: 
         lig_location = output_filename
         out_location = generate_unique_file_name('pose', 'pdbqt')
-        
         # Perform docking: 
         if lig_energy < 10000: 
             if receptor_type == '1syh': 
-                score_ = run_docking_1syh(lig_location, out_location, method=docking_program)
+                score_ = run_docking_1syh(lig_location, out_location, method=docking_program, bin=bin)
             if receptor_type == '4lde': 
-                score_ = run_docking_4lde(lig_location, out_location, method=docking_program)
+                score_ = run_docking_4lde(lig_location, out_location, method=docking_program, bin=bin)
             if receptor_type == '6y2f': 
-                score_ = run_docking_6y2f(lig_location, out_location, method=docking_program)
+                score_ = run_docking_6y2f(lig_location, out_location, method=docking_program, bin=bin)
         else: 
             return 10**4
-    
                 
         os.system('rm {} {}'.format(output_filename, out_location))
-        
     except: 
         os.system('rm {} {}'.format(output_filename, out_location))
         return 10**4
@@ -272,7 +267,3 @@ if __name__ == '__main__':
 
     # Run calculation for the 6y2f recepotor: 
     score = perform_calc_single(smi, '6y2f', docking_program='qvina')
-
-
-
-

@@ -1,6 +1,12 @@
 [![Documentation Status](https://readthedocs.org/projects/tartarus/badge/?version=latest)](https://tartarus.readthedocs.io/en/latest/?badge=latest)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
+# installation
+```
+mamba install openbabel -c conda-forge
+pip install -e .
+```
+
 # Tartarus: Practical and Realistic Benchmarks for Inverse Molecular Design
 
 This repository contains the code and results for the paper [Tartarus, an open-source collection of benchmarks for evaluation of a generative model](https://arxiv.org/abs/2209.12487).
