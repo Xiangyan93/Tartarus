@@ -30,7 +30,7 @@ file_dir = os.path.dirname(os.path.realpath(__file__))
 
 _mcf = pd.read_csv(os.path.join(file_dir, 'data/mcf.csv'))
 _pains = pd.read_csv(os.path.join(file_dir, 'data/wehi_pains.csv'), names=['smarts', 'names'])
-_filters = [Chem.MolFromSmarts(x) for x in _mcf.append(_pains, sort=True)['smarts'].values]
+_filters = [Chem.MolFromSmarts(x) for x in pd.concat([_mcf, _pains], ignore_index=True, sort=True)['smarts'].values]
 
 
 inf = open(os.path.join(file_dir, 'data/pains.txt'), "r")

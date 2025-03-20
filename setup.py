@@ -24,7 +24,6 @@ setuptools.setup(
     version=__version__,
     python_requires='>=3.8',
     install_requires=[
-        'pandas==1.5.3',
         'rdkit',
     ],
     author='Yan Xiang',
@@ -39,4 +38,5 @@ setuptools.setup(
         'Operating System :: OS Independent',
     ],
     include_package_data=True,
+    package_data={'': ['data/*', 'docking_structures/*/*']}
 )

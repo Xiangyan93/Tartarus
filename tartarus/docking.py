@@ -185,7 +185,7 @@ def generate_unique_file_name(base_name, extension):
     return file_name
 
 
-def perform_calc_single(smi, receptor_type, docking_program='qvina', bin=''): 
+def perform_calc_single(smi, receptor_type, docking_program='qvina', bin='', save_pdb=False): 
     """
     Performs docking calculations on a single molecule-receptor pair.
     
@@ -228,7 +228,7 @@ def perform_calc_single(smi, receptor_type, docking_program='qvina', bin=''):
         output_filename = generate_unique_file_name('lig', 'pdbqt')
         # print('smi: {} fname: {}'.format(smi, output_filename))
         cmd = ["%sobabel" % bin, "-ismi","-:" + smi,"-O", output_filename, "--gen3d"]
-        subprocess.run(cmd, timeout=20)
+        subprocess.run(cmd, timeout=60)
         
         # Ensure a stable molecule: 
         lig_energy = check_energy(output_filename, bin=bin)
@@ -246,10 +246,11 @@ def perform_calc_single(smi, receptor_type, docking_program='qvina', bin=''):
                 score_ = run_docking_6y2f(lig_location, out_location, method=docking_program, bin=bin)
         else: 
             return 10**4
-                
-        os.system('rm {} {}'.format(output_filename, out_location))
-    except: 
-        os.system('rm {} {}'.format(output_filename, out_location))
+        if not save_pdb:       
+            os.system('rm {} {}'.format(output_filename, out_location))
+    except:
+        if not save_pdb:
+            os.system('rm {} {}'.format(output_filename, out_location))
         return 10**4
 
     return score_
